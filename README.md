@@ -13,4 +13,4 @@ exposing 3 endpoint
 3. Guess the number https://guessapp.azurewebsites.net/guess/:number
 
 
-The app is hosted using app service on azurewebsites
+The app is hosted using app service on azure
