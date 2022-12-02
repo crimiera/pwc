@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const redis = require("redis");
 const { expressjwt: jwt } = require("express-jwt");
 const jwtwt = require("jsonwebtoken");
+const e = require("express");
 const app = express();
 const port = process.env.PORT || 2000;
 
@@ -56,7 +57,7 @@ app.get("/register", (req, res) => {
 
 app.get("/initialize", async (req, res) => {
   const max = 10000;
-  const min = 10;
+  const min = 1;
   const random = Math.floor(Math.random() * (max - min + 1) + min);
   const play = { uid: uuidv4(), random };
 
@@ -66,22 +67,23 @@ app.get("/initialize", async (req, res) => {
 });
 
 app.get("/guess/:uid/:number", async (req, res) => {
-  const number = req.params.number;
+  const number = parseInt(req.params.number);
   const uid = req.params.uid;
   const random = await redisClient.get(uid);
-
   let message = "Whats going on " + number;
+
   if (random) {
-    if (random === number) {
+    const randomNumber = parseInt(random);
+    if (randomNumber === number) {
       await redisClient.del(uid);
       message = `What a legend you guessed it ${number}!!!`;
-    } else if (!random) {
-      message = "Start new game!";
     } else if (random > number) {
       message = `Your number ${number} is smaller`;
     } else if (random < number) {
       message = `Your number ${number} is bigger`;
     }
+  } else {
+    message = "Start new game!";
   }
   res.json({ message });
 });
